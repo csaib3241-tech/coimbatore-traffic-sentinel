@@ -16,6 +16,11 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        hero: "bg-gradient-primary text-primary-foreground font-semibold shadow-[var(--shadow-glow)] hover:brightness-110",
+        glass: "glass text-foreground hover:bg-accent/60",
+        critical: "bg-critical text-critical-foreground font-semibold shadow-[var(--shadow-critical)] hover:brightness-110",
+        emergency: "bg-emergency text-emergency-foreground font-semibold shadow-[var(--shadow-emergency)] hover:brightness-110",
+        safe: "bg-safe text-safe-foreground font-semibold hover:brightness-110",
       },
       size: {
         default: "h-9 px-4 py-2",

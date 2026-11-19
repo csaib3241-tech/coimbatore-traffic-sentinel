@@ -1,35 +1,25 @@
 /*
  * Tailwind v4 entry: config lives here, with no tailwind.config.js or PostCSS plugin.
- * - Keep every @import in this top block, above @theme and the rest of the file. Install an
- *   npm package before @importing its CSS. Never @import a remote URL (web fonts, CDN CSS): the
- *   build resolves @import from the filesystem. Load those with a <link> in the head() of
- *   src/routes/__root.tsx and name the family in a --font-* token in @theme inline below.
+ * Keep every @import in this top block. Never @import a remote URL; web fonts load via <link> in __root.
  */
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
- *
- * The design lives in this file: oklch color tokens on the shadcn variables
- * (--background, --foreground, --primary, --secondary, --muted, --accent, ...) plus
- * new tokens as needed, font tokens, and custom styles and animations.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * SENTINEL ROAD design system — dark command-centre aesthetic.
+ * Navy/charcoal surfaces, electric cyan + blue signal colours, green "ok",
+ * amber "warning", red "critical". All colours oklch.
  */
 
 @theme inline {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -45,6 +35,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -57,6 +48,20 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+
+  --color-safe: var(--safe);
+  --color-safe-foreground: var(--safe-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-critical: var(--critical);
+  --color-critical-foreground: var(--critical-foreground);
+  --color-emergency: var(--emergency);
+  --color-emergency-foreground: var(--emergency-foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -70,86 +75,391 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --animate-pulse-ring: pulse-ring 1.8s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+  --animate-scan: scan 2.4s linear infinite;
+  --animate-dash: dash-flow 1.2s linear infinite;
+  --animate-blink: blink 1s steps(2, start) infinite;
+  --animate-float-up: float-up 0.6s ease-out both;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-}
+  --radius: 0.75rem;
+  --background: oklch(0.155 0.028 257);
+  --foreground: oklch(0.95 0.012 240);
+  --surface: oklch(0.185 0.03 256);
+  --surface-2: oklch(0.225 0.034 255);
+  --card: oklch(0.2 0.032 256);
+  --card-foreground: oklch(0.95 0.012 240);
+  --popover: oklch(0.205 0.034 256);
+  --popover-foreground: oklch(0.95 0.012 240);
+  --primary: oklch(0.8 0.145 210);
+  --primary-foreground: oklch(0.16 0.03 257);
+  --primary-glow: oklch(0.68 0.19 248);
+  --secondary: oklch(0.26 0.035 255);
+  --secondary-foreground: oklch(0.93 0.015 240);
+  --muted: oklch(0.25 0.03 256);
+  --muted-foreground: oklch(0.7 0.03 250);
+  --accent: oklch(0.29 0.045 245);
+  --accent-foreground: oklch(0.95 0.012 240);
+  --destructive: oklch(0.64 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 20);
+  --border: oklch(0.42 0.04 250 / 35%);
+  --input: oklch(0.42 0.04 250 / 45%);
+  --ring: oklch(0.8 0.145 210);
 
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --safe: oklch(0.78 0.17 150);
+  --safe-foreground: oklch(0.18 0.04 150);
+  --warning: oklch(0.79 0.16 65);
+  --warning-foreground: oklch(0.2 0.05 60);
+  --critical: oklch(0.65 0.23 25);
+  --critical-foreground: oklch(0.98 0.01 20);
+  --emergency: oklch(0.66 0.2 255);
+  --emergency-foreground: oklch(0.98 0.01 250);
+
+  --glass: oklch(0.22 0.035 256 / 62%);
+  --glass-border: oklch(0.75 0.08 220 / 16%);
+
+  --chart-1: oklch(0.8 0.145 210);
+  --chart-2: oklch(0.66 0.2 255);
+  --chart-3: oklch(0.78 0.17 150);
+  --chart-4: oklch(0.79 0.16 65);
+  --chart-5: oklch(0.65 0.23 25);
+
+  --sidebar: oklch(0.17 0.03 257);
+  --sidebar-foreground: oklch(0.9 0.015 240);
+  --sidebar-primary: oklch(0.8 0.145 210);
+  --sidebar-primary-foreground: oklch(0.16 0.03 257);
+  --sidebar-accent: oklch(0.25 0.04 250);
+  --sidebar-accent-foreground: oklch(0.96 0.01 240);
+  --sidebar-border: oklch(0.42 0.04 250 / 30%);
+  --sidebar-ring: oklch(0.8 0.145 210);
+
+  --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
+  --gradient-critical: linear-gradient(135deg, var(--critical), var(--warning));
+  --gradient-backdrop:
+    radial-gradient(1200px 600px at 85% -10%, oklch(0.45 0.15 240 / 22%), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, oklch(0.5 0.13 200 / 14%), transparent 60%);
+  --shadow-glass: 0 1px 0 0 oklch(1 0 0 / 5%) inset, 0 20px 40px -24px oklch(0 0 0 / 70%);
+  --shadow-glow: 0 0 0 1px oklch(0.8 0.145 210 / 35%), 0 0 24px -4px oklch(0.8 0.145 210 / 55%);
+  --shadow-critical: 0 0 0 1px oklch(0.65 0.23 25 / 50%), 0 0 28px -4px oklch(0.65 0.23 25 / 60%);
+  --shadow-emergency: 0 0 0 1px oklch(0.66 0.2 255 / 55%), 0 0 28px -4px oklch(0.66 0.2 255 / 65%);
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
-
+  html {
+    color-scheme: dark;
+  }
   body {
     background-color: var(--color-background);
+    background-image: var(--gradient-backdrop);
+    background-attachment: fixed;
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: oklch(0.8 0.145 210 / 35%);
+  }
+}
+
+/* ---------- Reusable surfaces ---------- */
+@utility glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+@utility glow-primary {
+  box-shadow: var(--shadow-glow);
+}
+@utility glow-critical {
+  box-shadow: var(--shadow-critical);
+}
+@utility glow-emergency {
+  box-shadow: var(--shadow-emergency);
+}
+@utility bg-gradient-primary {
+  background-image: var(--gradient-primary);
+}
+@utility bg-gradient-critical {
+  background-image: var(--gradient-critical);
+}
+@utility text-gradient-primary {
+  background-image: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+@utility grid-bg {
+  background-image:
+    linear-gradient(oklch(0.8 0.145 210 / 6%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.8 0.145 210 / 6%) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 0.85; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes scan {
+  0% { transform: translateY(-10%); }
+  100% { transform: translateY(1000%); }
+}
+@keyframes dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+@keyframes blink {
+  to { visibility: hidden; }
+}
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes flow-dot {
+  0% { left: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+@keyframes flow-dot-y {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes draw-box {
+  from { clip-path: inset(0 100% 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@utility animate-draw-box {
+  animation: draw-box 0.7s ease-out both;
+}
+@utility flow-dot {
+  animation: flow-dot 2.2s linear infinite;
+}
+@utility flow-dot-y {
+  animation: flow-dot-y 2.2s linear infinite;
+}
+
+/* ---------- Leaflet dark theming (OSM raster tiles darkened) ---------- */
+.leaflet-container {
+  background: oklch(0.16 0.025 257);
+  font-family: var(--font-sans);
+}
+.sentinel-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(195deg) brightness(0.82) contrast(0.92) saturate(0.55);
+}
+.leaflet-control-zoom a {
+  background: var(--glass) !important;
+  color: var(--foreground) !important;
+  border-color: var(--glass-border) !important;
+  backdrop-filter: blur(10px);
+}
+.leaflet-control-zoom {
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+.leaflet-control-attribution {
+  background: oklch(0.16 0.025 257 / 75%) !important;
+  color: var(--muted-foreground) !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a {
+  color: var(--primary) !important;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 18px 40px -12px oklch(0 0 0 / 70%);
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--muted-foreground);
+}
+
+/* Vehicle & map markers (divIcons) */
+.veh-marker {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+.veh-marker .core {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid oklch(0.16 0.03 257);
+  background: var(--veh-color);
+  box-shadow: 0 0 10px var(--veh-color);
+}
+.veh-marker .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--veh-color);
+  animation: pulse-ring 1.6s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+.veh-normal { --veh-color: var(--safe); }
+.veh-warning { --veh-color: var(--warning); }
+.veh-violation { --veh-color: var(--critical); }
+.veh-emergency { --veh-color: var(--emergency); }
+.veh-marker.is-selected .core {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+.veh-marker .tag {
+  position: absolute;
+  left: 18px;
+  top: -4px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: oklch(0.16 0.03 257 / 85%);
+  color: var(--veh-color);
+  border: 1px solid color-mix(in oklab, var(--veh-color) 50%, transparent);
+}
+
+.em-marker {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: var(--emergency);
+  color: var(--emergency-foreground);
+  border: 2px solid oklch(0.98 0.01 250);
+  box-shadow: var(--shadow-emergency);
+}
+.em-marker.em-fire { background: var(--critical); box-shadow: var(--shadow-critical); }
+.em-marker.em-police { background: oklch(0.45 0.16 260); }
+.em-marker .ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  border: 2px solid var(--emergency);
+  animation: pulse-ring 1.4s ease-out infinite;
+}
+.em-marker svg { width: 16px; height: 16px; }
+
+.sig-marker {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: oklch(0.16 0.03 257);
+  border: 1.5px solid var(--sig-color, var(--muted-foreground));
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 8px var(--sig-color, transparent);
+}
+.sig-marker::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--sig-color, var(--muted-foreground));
+}
+.sig-red { --sig-color: var(--critical); }
+.sig-amber { --sig-color: var(--warning); }
+.sig-green { --sig-color: var(--safe); }
+.sig-priority { --sig-color: var(--emergency); animation: pulse-sig 0.9s ease-in-out infinite; }
+@keyframes pulse-sig {
+  50% { box-shadow: 0 0 18px var(--emergency); transform: scale(1.15); }
+}
+
+.pin-marker {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: oklch(0.16 0.03 257 / 90%);
+  border: 1.5px solid var(--pin-color);
+  color: var(--pin-color);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--pin-color) 50%, transparent);
+}
+.pin-marker svg { width: 15px; height: 15px; }
+.pin-hospital { --pin-color: var(--safe); }
+.pin-accident { --pin-color: var(--warning); }
+.pin-incident { --pin-color: var(--critical); }
+.pin-camera { --pin-color: var(--primary); }
+
+.route-flow {
+  stroke-dasharray: 8 16;
+  animation: dash-flow 0.8s linear infinite;
+}
+
+.zone-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  text-shadow: 0 1px 3px oklch(0 0 0 / 90%);
+}
+.zone-label::before { display: none; }
+
+.popup-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 12px;
+  min-width: 190px;
+}
+.popup-grid dt { color: var(--muted-foreground); }
+.popup-grid dd { margin: 0; font-weight: 600; text-align: right; }
+.popup-title {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.popup-chip {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  background: color-mix(in oklab, var(--veh-color) 22%, transparent);
+  color: var(--veh-color);
+}
+
+/* Smooth marker motion between simulation ticks; disabled while the map zooms. */
+.leaflet-marker-icon.veh-anim {
+  transition: transform 0.5s linear;
+}
+.leaflet-zoom-anim .leaflet-marker-icon.veh-anim {
+  transition: none;
 }
