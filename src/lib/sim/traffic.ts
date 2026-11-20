@@ -89,7 +89,7 @@ export function createVehicles(
       speeder: s.speeder,
       speed,
       overSeconds: 0,
-      status: "normal",
+      status: classifySpeed(speed, zr.limit, 0),
       zoneType: zr.type,
       zoneId: zr.zone?.id,
       zoneName: zr.zone?.name ?? "Urban Road",

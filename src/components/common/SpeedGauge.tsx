@@ -2,12 +2,13 @@ import { cn } from "@/lib/utils";
 import type { SpeedStatus } from "@/lib/sim/speed-rules";
 
 const MAX = 140;
+const r2 = (n: number) => Math.round(n * 100) / 100;
 const toAngle = (v: number) => -120 + (Math.min(MAX, Math.max(0, v)) / MAX) * 240;
 
 function arc(r: number, a0: number, a1: number) {
   const p = (a: number) => {
     const rad = ((a - 90) * Math.PI) / 180;
-    return [100 + r * Math.cos(rad), 100 + r * Math.sin(rad)];
+    return [r2(100 + r * Math.cos(rad)), r2(100 + r * Math.sin(rad))];
   };
   const [x0, y0] = p(a0);
   const [x1, y1] = p(a1);
@@ -41,11 +42,11 @@ export function SpeedGauge({ speed, limit, status, className }: { speed: number;
       {Array.from({ length: 15 }, (_, i) => {
         const a = ((toAngle(i * 10) - 90) * Math.PI) / 180;
         return (
-          <line key={i} x1={100 + 64 * Math.cos(a)} y1={100 + 64 * Math.sin(a)} x2={100 + (i % 2 ? 68 : 70) * Math.cos(a)} y2={100 + (i % 2 ? 68 : 70) * Math.sin(a)} stroke="var(--muted-foreground)" strokeWidth={i % 2 ? 1 : 1.6} />
+          <line key={i} x1={r2(100 + 64 * Math.cos(a))} y1={r2(100 + 64 * Math.sin(a))} x2={r2(100 + (i % 2 ? 68 : 70) * Math.cos(a))} y2={r2(100 + (i % 2 ? 68 : 70) * Math.sin(a))} stroke="var(--muted-foreground)" strokeWidth={i % 2 ? 1 : 1.6} />
         );
       })}
-      <line x1={100 + 70 * Math.cos(lr)} y1={100 + 70 * Math.sin(lr)} x2={100 + 94 * Math.cos(lr)} y2={100 + 94 * Math.sin(lr)} stroke="var(--foreground)" strokeWidth="2.5" />
-      <text x={100 + 104 * Math.cos(lr)} y={100 + 104 * Math.sin(lr) + 3} textAnchor="middle" fontSize="9" fill="var(--foreground)" fontFamily="var(--font-mono)">{limit}</text>
+      <line x1={r2(100 + 70 * Math.cos(lr))} y1={r2(100 + 70 * Math.sin(lr))} x2={r2(100 + 94 * Math.cos(lr))} y2={r2(100 + 94 * Math.sin(lr))} stroke="var(--foreground)" strokeWidth="2.5" />
+      <text x={r2(100 + 104 * Math.cos(lr))} y={r2(100 + 104 * Math.sin(lr) + 3)} textAnchor="middle" fontSize="9" fill="var(--foreground)" fontFamily="var(--font-mono)">{limit}</text>
       <text x="100" y="104" textAnchor="middle" fontSize="40" fontWeight="700" fill={color} fontFamily="var(--font-display)" style={{ transition: "fill .3s" }}>{speed}</text>
       <text x="100" y="122" textAnchor="middle" fontSize="10" fill="var(--muted-foreground)" letterSpacing="2">KM/H</text>
       <text x="100" y="160" textAnchor="middle" fontSize="10" fill="var(--muted-foreground)">Limit {limit} km/h</text>
