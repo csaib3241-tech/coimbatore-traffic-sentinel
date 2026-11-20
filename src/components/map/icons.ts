@@ -18,7 +18,7 @@ export const SVG = {
 export function vehicleIcon(
   L: LeafletNS,
   status: SpeedStatus | "emergency",
-  opts: { selected?: boolean; tag?: string; alerted?: boolean } = {},
+  opts: { selected?: boolean; tag?: string | undefined; alerted?: boolean } = {},
 ) {
   const ring = status !== "normal" || opts.alerted ? '<span class="ring"></span>' : "";
   const tag = opts.tag ? `<span class="tag">${opts.tag}</span>` : "";

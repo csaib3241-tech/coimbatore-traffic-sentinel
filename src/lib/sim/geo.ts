@@ -22,20 +22,20 @@ export interface Polyline {
 
 export function buildPolyline(pts: LatLng[]): Polyline {
   const cum = [0];
-  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + haversine(pts[i - 1], pts[i]));
-  return { pts, cum, length: cum[cum.length - 1] };
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1]! + haversine(pts[i - 1]!, pts[i]!));
+  return { pts, cum, length: cum[cum.length - 1]! };
 }
 
 /** Point at `dist` metres along the polyline (clamped to its ends). */
 export function pointAt(pl: Polyline, dist: number): LatLng {
   const d = Math.max(0, Math.min(pl.length, dist));
   let i = 1;
-  while (i < pl.cum.length - 1 && pl.cum[i] < d) i++;
-  const segStart = pl.cum[i - 1];
-  const segLen = pl.cum[i] - segStart || 1;
+  while (i < pl.cum.length - 1 && pl.cum[i]! < d) i++;
+  const segStart = pl.cum[i - 1]!;
+  const segLen = pl.cum[i]! - segStart || 1;
   const t = (d - segStart) / segLen;
-  const a = pl.pts[i - 1];
-  const b = pl.pts[i];
+  const a = pl.pts[i - 1]!;
+  const b = pl.pts[i]!;
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 }
 
@@ -49,7 +49,7 @@ export function slicePolyline(pl: Polyline, from: number, to: number): LatLng[] 
   const b = Math.min(pl.length, Math.max(from, to));
   const out: LatLng[] = [pointAt(pl, a)];
   for (let i = 0; i < pl.pts.length; i++) {
-    if (pl.cum[i] > a && pl.cum[i] < b) out.push(pl.pts[i]);
+    if (pl.cum[i]! > a && pl.cum[i]! < b) out.push(pl.pts[i]!);
   }
   out.push(pointAt(pl, b));
   return out;

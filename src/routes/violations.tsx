@@ -15,8 +15,8 @@ import { STATUS_LABEL, type VerificationStatus, type ViolationRecord } from "@/l
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/violations")({
-  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
-    q: typeof search.q === "string" && search.q ? search.q : undefined,
+  validateSearch: (search: Record<string, unknown>): { q?: string | undefined } => ({
+    q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
   }),
   head: () => ({
     meta: [
@@ -68,13 +68,13 @@ function ViolationDetection() {
   useEffect(() => setQuery(q ?? ""), [q]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  const cam = CAMERAS[det?.cam ?? camIdx];
+  const cam = CAMERAS[det?.cam ?? camIdx]!;
   const running = step >= 0 && step < STEPS.length;
 
   const simulate = () => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
-    const c = CAMERAS[camIdx];
+    const c = CAMERAS[camIdx]!;
     const speed = Math.round(c.speedRange[0] + Math.random() * (c.speedRange[1] - c.speedRange[0]));
     const limit = limits[c.zoneType];
     setDet({ cam: camIdx, speed, limit });
@@ -110,7 +110,7 @@ function ViolationDetection() {
       );
     });
     // plate typing effect during step 2
-    const startType = STEP_MS[0] + STEP_MS[1];
+    const startType = STEP_MS[0]! + STEP_MS[1]!;
     c.plate.split("").forEach((_, i) => {
       timers.current.push(setTimeout(() => setTyped(c.plate.slice(0, i + 1)), startType + 80 + i * 75));
     });
@@ -233,7 +233,7 @@ function ViolationDetection() {
                   <p className="font-mono text-base font-bold">{cam.plate}</p>
                   <p><span className="text-critical font-semibold">{det.speed} km/h</span> <span className="text-muted-foreground">vs limit {det.limit}</span></p>
                   <Badge variant="critical">Over-speeding · +{det.speed - det.limit} km/h</Badge>
-                  <p className="text-xs text-muted-foreground"><TimeText ts={Date.now()} mode="full" /></p>
+                  {(() => { const rec = violations.find((v) => v.id === det.recordId); return rec ? <p className="text-xs text-muted-foreground"><TimeText ts={rec.ts} mode="full" /></p> : null; })()}
                 </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -358,8 +358,8 @@ function ViolationRow({ v, onReview }: { v: ViolationRecord; onReview: () => voi
           <Button size="sm" variant="glass" onClick={onReview}><Eye /> Review</Button>
           {v.status === "pending" && (
             <>
-              <Button size="sm" variant="safe" aria-label={`Verify ${v.plate}`} onClick={() => { actions.review(v.id, "verify"); toast.success(`Verified · ${v.plate}`); }}><Check /></Button>
-              <Button size="sm" variant="outline" aria-label={`Reject ${v.plate}`} onClick={() => { actions.review(v.id, "reject"); toast(`Rejected · ${v.plate}`); }}><Ban /></Button>
+              <Button size="sm" variant="safe" aria-label={`Verify ${v.plate}`} onClick={() => { if (actions.review(v.id, "verify")) toast.success(`Verified · ${v.plate}`); else toast.error("Add the reviewing officer's name in Settings first."); }}><Check /></Button>
+              <Button size="sm" variant="outline" aria-label={`Reject ${v.plate}`} onClick={() => { if (actions.review(v.id, "reject")) toast(`Rejected · ${v.plate}`); else toast.error("Add the reviewing officer's name in Settings first."); }}><Ban /></Button>
             </>
           )}
         </div>

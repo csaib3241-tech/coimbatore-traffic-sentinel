@@ -98,7 +98,7 @@ interface FeedItem {
 
 function initialUnits(): Unit[] {
   return [
-    { id: "AMB 006", kind: "ambulance", label: "Ambulance", route: HOSPITALS[0].route, dist: 1800, speed: 52, destination: "KMCH Hospital" },
+    { id: "AMB 006", kind: "ambulance", label: "Ambulance", route: HOSPITALS[0]!.route, dist: 1800, speed: 52, destination: "KMCH Hospital" },
     { id: "FIRE 02", kind: "fire", label: "Fire engine", route: ROADS.trichy, dist: 2600, speed: 46, destination: "Singanallur" },
     { id: "PCR 07", kind: "police", label: "Police patrol", route: ROADS.sathy, dist: 900, speed: 40, destination: "Ganapathy patrol" },
   ];
@@ -216,7 +216,7 @@ function Dashboard() {
   }, [ctx, filters.signals]);
   useEffect(() => {
     if (!ctx) return;
-    signalMarkers.current.forEach((m, i) => m.setIcon(signalIcon(ctx.L, signalPhase(tick, SIGNAL_POINTS[i].phase))));
+    signalMarkers.current.forEach((m, i) => m.setIcon(signalIcon(ctx.L, signalPhase(tick, SIGNAL_POINTS[i]!.phase))));
   }, [ctx, tick]);
 
   // Emergency units

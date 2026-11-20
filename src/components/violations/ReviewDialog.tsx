@@ -20,7 +20,10 @@ export function ReviewDialog({ recordId, onOpenChange }: { recordId: string | nu
   useEffect(() => setNote(""), [recordId]);
 
   const decide = (r: ViolationRecord, decision: "verify" | "reject") => {
-    actions.review(r.id, decision, note.trim() || undefined);
+    if (!actions.review(r.id, decision, note.trim() || undefined)) {
+      toast.error("Add the reviewing officer's name in Settings before reviewing.");
+      return;
+    }
     if (decision === "verify") {
       toast.success(`Violation verified · ${r.plate}`, { description: "Demo e-notice generated after officer verification." });
       actions.notify({ title: "Violation verified", body: `${r.plate} — ${r.type} confirmed by ${operator}.`, level: "success" });

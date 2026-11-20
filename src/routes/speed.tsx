@@ -263,7 +263,7 @@ function SpeedMonitoring() {
                     )}
                   </span>
                 </div>
-                <Slider min={0} max={140} step={1} value={[selected.manualSpeed ?? selected.speed]} onValueChange={([v]) => setManual(v)} />
+                <Slider min={0} max={140} step={1} value={[selected.manualSpeed ?? selected.speed]} onValueChange={([v]) => v !== undefined && setManual(v)} />
                 {!running && <p className="mt-2 text-[11px] text-muted-foreground">Start monitoring to see the vehicle respond.</p>}
               </div>
             </Panel>
@@ -323,7 +323,8 @@ function SpeedMonitoring() {
 
 function LimitControl({ zone, value }: { zone: keyof SpeedLimits; value: number }) {
   const tone = { school: "text-warning", residential: "text-primary", highway: "text-safe", urban: "text-muted-foreground" }[zone];
-  const range = { school: [10, 60], residential: [20, 70], highway: [50, 120], urban: [30, 80] }[zone];
+  const RANGES: Record<keyof SpeedLimits, [number, number]> = { school: [10, 60], residential: [20, 70], highway: [50, 120], urban: [30, 80] };
+  const range = RANGES[zone];
   return (
     <div className="rounded-xl border border-border/60 bg-background/30 p-3">
       <div className="flex items-center justify-between">
@@ -335,12 +336,12 @@ function LimitControl({ zone, value }: { zone: keyof SpeedLimits; value: number 
         </Tooltip>
         <span className="font-display text-lg font-bold tabular">{value}<span className="ml-0.5 text-xs font-normal text-muted-foreground">km/h</span></span>
       </div>
-      <Slider className="mt-3" min={range[0]} max={range[1]} step={5} value={[value]} onValueChange={([v]) => actions.setLimit(zone, v)} />
+      <Slider className="mt-3" min={range[0]} max={range[1]} step={5} value={[value]} onValueChange={([v]) => v !== undefined && actions.setLimit(zone, v)} />
     </div>
   );
 }
 
-function DriverAlert({ vehicle, enabled }: { vehicle?: SimVehicle; enabled: boolean }) {
+function DriverAlert({ vehicle, enabled }: { vehicle?: SimVehicle | undefined; enabled: boolean }) {
   if (!vehicle) return null;
   const alerting = enabled && vehicle.status !== "normal";
   const critical = vehicle.status === "violation";

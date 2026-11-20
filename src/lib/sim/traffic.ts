@@ -16,12 +16,12 @@ export interface SimVehicle {
   /** Drivers flagged as speeders ignore zone limits. */
   speeder: boolean;
   /** Operator override from the speed-monitoring controls. */
-  manualSpeed?: number;
+  manualSpeed?: number | undefined;
   speed: number;
   overSeconds: number;
   status: SpeedStatus;
   zoneType: ZoneType;
-  zoneId?: string;
+  zoneId?: string | undefined;
   zoneName: string;
   limit: number;
   pos: LatLng;
@@ -34,7 +34,7 @@ const RTO = ["37", "38", "66", "99", "37", "38"];
 export function makePlate(rand: () => number): string {
   const l = () => LETTERS[Math.floor(rand() * LETTERS.length)];
   const num = String(1000 + Math.floor(rand() * 9000));
-  return `TN ${RTO[Math.floor(rand() * RTO.length)]} ${l()}${l()} ${num}`;
+  return `TN ${RTO[Math.floor(rand() * RTO.length)]!} ${l()}${l()} ${num}`;
 }
 
 function pickCategory(r: number): VehicleCategory {
@@ -107,7 +107,7 @@ export function createVehicles(
         {
           plate: makePlate(rand),
           category,
-          road: roads[Math.floor(rand() * roads.length)],
+          road: roads[Math.floor(rand() * roads.length)]!,
           at: rand(),
           dir: rand() < 0.5 ? 1 : -1,
           cruise: Math.round(lo + rand() * (hi - lo)),

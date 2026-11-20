@@ -26,15 +26,15 @@ export interface ViolationRecord {
   location: string;
   ts: number;
   source: "ANPR Camera" | "GPS Geofence";
-  camera?: string;
+  camera?: string | undefined;
   confidence: number;
   status: VerificationStatus;
-  evidence?: Evidence;
-  reviewedBy?: string;
-  reviewedAt?: number;
-  reviewNote?: string;
+  evidence?: Evidence | undefined;
+  reviewedBy?: string | undefined;
+  reviewedAt?: number | undefined;
+  reviewNote?: string | undefined;
   /** Demonstration e-notice reference — only ever set once a human has verified the record. */
-  noticeId?: string;
+  noticeId?: string | undefined;
 }
 
 export type ReviewDecision = "verify" | "reject";

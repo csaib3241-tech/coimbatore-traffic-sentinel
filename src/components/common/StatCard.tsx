@@ -26,9 +26,9 @@ export function StatCard({
 }: {
   label: string;
   value?: number;
-  suffix?: string;
-  decimals?: number;
-  text?: string;
+  suffix?: string | undefined;
+  decimals?: number | undefined;
+  text?: string | undefined;
   icon: LucideIcon;
   tone?: Tone;
   delta?: string;

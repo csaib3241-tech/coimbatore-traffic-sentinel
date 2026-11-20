@@ -56,7 +56,7 @@ function seedViolations(now: number): ViolationRecord[] {
   ];
   const ago = [4, 9, 22, 41, 63, 88, 131, 176];
   return rows.map((r, i) => {
-    const ts = now - ago[i] * MIN;
+    const ts = now - ago[i]! * MIN;
     const rec: ViolationRecord = { ...r, id: `VR-${String(240_410 + i)}`, ts };
     if (rec.status === "verified") {
       rec.reviewedAt = ts + 6 * MIN;
@@ -135,13 +135,17 @@ export const actions = {
     set((s) => ({ ...s, violations: [rec, ...s.violations] }));
     return rec;
   },
-  review(id: string, decision: ReviewDecision, note?: string) {
+  review(id: string, decision: ReviewDecision, note?: string): boolean {
+    const s0 = get();
+    const target = s0.violations.find((v) => v.id === id);
+    if (!target || target.status !== "pending" || !s0.operator.trim()) return false;
     set((s) => ({
       ...s,
       violations: s.violations.map((v) =>
         v.id === id ? applyReview(v, decision, s.operator, Date.now(), note) : v,
       ),
     }));
+    return true;
   },
   notify(n: Omit<Notice, "id" | "ts" | "read">) {
     set((s) => ({

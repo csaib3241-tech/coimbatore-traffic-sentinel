@@ -90,7 +90,7 @@ export const LANDMARKS: Landmark[] = [
 ];
 
 export function nearestLandmark(p: LatLng): string {
-  let best = LANDMARKS[0];
+  let best = LANDMARKS[0]!;
   let bd = Infinity;
   for (const l of LANDMARKS) {
     const d = haversine(p, l.at);
@@ -108,7 +108,7 @@ export function locationLabel(road: RoadId, p: LatLng): string {
 
 export interface ZoneResolution {
   type: ZoneType;
-  zone?: Zone;
+  zone?: Zone | undefined;
   limit: number;
 }
 
@@ -167,7 +167,7 @@ export interface Hospital {
 
 export const INCIDENT = {
   name: "Two-wheeler collision · Gandhipuram",
-  at: ROAD_GEOMETRY.em_kmch[0],
+  at: ROAD_GEOMETRY.em_kmch[0]!,
 };
 
 export const HOSPITALS: Hospital[] = [
@@ -175,7 +175,7 @@ export const HOSPITALS: Hospital[] = [
     id: "kmch",
     name: "KMCH Speciality Hospital, Avinashi Road",
     short: "KMCH",
-    at: ROAD_GEOMETRY.em_kmch[ROAD_GEOMETRY.em_kmch.length - 1],
+    at: ROAD_GEOMETRY.em_kmch[ROAD_GEOMETRY.em_kmch.length - 1]!,
     route: buildPolyline(ROAD_GEOMETRY.em_kmch),
     signals: [
       { name: "100 Feet Road Jn", at: 0.1 },
@@ -190,7 +190,7 @@ export const HOSPITALS: Hospital[] = [
     id: "cmch",
     name: "Government Medical College Hospital",
     short: "CMCH",
-    at: ROAD_GEOMETRY.em_cmch[ROAD_GEOMETRY.em_cmch.length - 1],
+    at: ROAD_GEOMETRY.em_cmch[ROAD_GEOMETRY.em_cmch.length - 1]!,
     route: buildPolyline(ROAD_GEOMETRY.em_cmch),
     signals: [
       { name: "Gandhipuram Jn", at: 0.12 },
@@ -204,7 +204,7 @@ export const HOSPITALS: Hospital[] = [
     id: "srh",
     name: "Sri Ramakrishna Hospital",
     short: "SRH",
-    at: ROAD_GEOMETRY.em_srh[ROAD_GEOMETRY.em_srh.length - 1],
+    at: ROAD_GEOMETRY.em_srh[ROAD_GEOMETRY.em_srh.length - 1]!,
     route: buildPolyline(ROAD_GEOMETRY.em_srh),
     signals: [
       { name: "Gandhipuram Jn", at: 0.2 },

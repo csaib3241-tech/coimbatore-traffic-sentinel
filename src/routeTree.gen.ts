@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as ArchitectureRouteImport } from './routes/architecture'
 import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SpeedRouteImport } from './routes/speed'
 import { Route as ViolationsRouteImport } from './routes/violations'
 
@@ -19,9 +22,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchitectureRoute = ArchitectureRouteImport.update({
+  id: '/architecture',
+  path: '/architecture',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmergencyRoute = EmergencyRouteImport.update({
   id: '/emergency',
   path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SpeedRoute = SpeedRouteImport.update({
@@ -37,34 +55,68 @@ const ViolationsRoute = ViolationsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/architecture': typeof ArchitectureRoute
   '/emergency': typeof EmergencyRoute
+  '/settings': typeof SettingsRoute
   '/speed': typeof SpeedRoute
   '/violations': typeof ViolationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/architecture': typeof ArchitectureRoute
   '/emergency': typeof EmergencyRoute
+  '/settings': typeof SettingsRoute
   '/speed': typeof SpeedRoute
   '/violations': typeof ViolationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/architecture': typeof ArchitectureRoute
   '/emergency': typeof EmergencyRoute
+  '/settings': typeof SettingsRoute
   '/speed': typeof SpeedRoute
   '/violations': typeof ViolationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/emergency' | '/speed' | '/violations'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/architecture'
+    | '/emergency'
+    | '/settings'
+    | '/speed'
+    | '/violations'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/emergency' | '/speed' | '/violations'
-  id: '__root__' | '/' | '/emergency' | '/speed' | '/violations'
+  to:
+    | '/'
+    | '/analytics'
+    | '/architecture'
+    | '/emergency'
+    | '/settings'
+    | '/speed'
+    | '/violations'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/architecture'
+    | '/emergency'
+    | '/settings'
+    | '/speed'
+    | '/violations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  ArchitectureRoute: typeof ArchitectureRoute
   EmergencyRoute: typeof EmergencyRoute
+  SettingsRoute: typeof SettingsRoute
   SpeedRoute: typeof SpeedRoute
   ViolationsRoute: typeof ViolationsRoute
 }
@@ -78,11 +130,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/architecture': {
+      id: '/architecture'
+      path: '/architecture'
+      fullPath: '/architecture'
+      preLoaderRoute: typeof ArchitectureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/emergency': {
       id: '/emergency'
       path: '/emergency'
       fullPath: '/emergency'
       preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/speed': {
@@ -104,7 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  ArchitectureRoute: ArchitectureRoute,
   EmergencyRoute: EmergencyRoute,
+  SettingsRoute: SettingsRoute,
   SpeedRoute: SpeedRoute,
   ViolationsRoute: ViolationsRoute,
 }

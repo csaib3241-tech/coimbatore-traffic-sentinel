@@ -81,7 +81,7 @@ export function LiveDot({ className, tone = "primary" }: { className?: string; t
 }
 
 /** Counts smoothly toward `value` whenever it changes. */
-export function AnimatedNumber({ value, decimals = 0, className }: { value: number; decimals?: number; className?: string }) {
+export function AnimatedNumber({ value, decimals = 0, className }: { value: number; decimals?: number | undefined; className?: string | undefined }) {
   const [display, setDisplay] = useState(value);
   const from = useRef(value);
   useEffect(() => {
@@ -130,7 +130,7 @@ export function LiveClock() {
   return <span className="tabular">{format(now, "HH:mm:ss")}</span>;
 }
 
-export function Stat({ label, value, tone }: { label: string; value: ReactNode; tone?: "critical" | "safe" | "warning" | "emergency" | "primary" }) {
+export function Stat({ label, value, tone }: { label: string; value: ReactNode; tone?: "critical" | "safe" | "warning" | "emergency" | "primary" | undefined }) {
   const color = tone ? { critical: "text-critical", safe: "text-safe", warning: "text-warning", emergency: "text-emergency", primary: "text-primary" }[tone] : "";
   return (
     <div className="flex items-center justify-between gap-3 py-1.5 text-sm">
