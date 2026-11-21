@@ -28,3 +28,12 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules (Sentinel Road)
+
+- All data is simulated client-side (no backend): shared state lives in `src/lib/store.ts` (useSyncExternalStore singleton) so violations, alerts and limits stay consistent across pages.
+- Simulation logic and rules are pure modules under `src/lib/sim/` and `src/lib/violations.ts`, covered by `src/test/rules.test.ts`; keep UI free of rule logic so tests stay meaningful.
+- Road geometry is pre-fetched static data (`src/lib/sim/road-geometry.ts`); never call routing APIs at runtime — the demo must work offline from external services.
+- Leaflet is imported dynamically inside `useLeafletMap` (it touches `window` at import); never import it statically in an SSR-reachable module.
+- Demo randomness uses the seeded PRNG in `geo.ts` for initial state so server and browser render identically; timestamps render via `TimeText` after hydration.
+- A violation only gets a notice reference via `applyReview(..., "verify")` by a named officer — preserve this human-in-the-loop gate.

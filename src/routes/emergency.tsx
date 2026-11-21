@@ -335,7 +335,7 @@ function EmergencyResponse() {
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Select value={hospitalId} onValueChange={(v) => setHospitalId(v as Hospital["id"])} disabled={active}>
-              <SelectTrigger className="h-10 w-[230px] bg-background/50"><HospitalIcon className="size-4 text-safe" /><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-10 w-[290px] gap-2 bg-background/50"><HospitalIcon className="size-4 shrink-0 text-safe" /><SelectValue /></SelectTrigger>
               <SelectContent>
                 {HOSPITALS.map((h) => <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>)}
               </SelectContent>
