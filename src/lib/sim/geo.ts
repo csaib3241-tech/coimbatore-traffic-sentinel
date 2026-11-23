@@ -66,3 +66,23 @@ export function seededRandom(seed: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+/** Distance in metres from `p` to segment a–b (local equirectangular projection; accurate at city scale). */
+export function pointSegmentDistance(p: LatLng, a: LatLng, b: LatLng): number {
+  const k = Math.cos(rad(a[0]));
+  const ax = a[1] * k * 111320, ay = a[0] * 110540;
+  const bx = b[1] * k * 111320, by = b[0] * 110540;
+  const px = p[1] * k * 111320, py = p[0] * 110540;
+  const dx = bx - ax, dy = by - ay;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+  return Math.hypot(px - ax - t * dx, py - ay - t * dy);
+}
+
+/** Shortest distance in metres from `p` to a polyline given as vertices. */
+export function distanceToPath(p: LatLng, path: LatLng[]): number {
+  if (path.length === 1) return haversine(p, path[0]!);
+  let best = Infinity;
+  for (let i = 1; i < path.length; i++) best = Math.min(best, pointSegmentDistance(p, path[i - 1]!, path[i]!));
+  return best;
+}
