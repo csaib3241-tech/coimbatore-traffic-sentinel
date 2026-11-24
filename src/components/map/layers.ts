@@ -5,6 +5,7 @@ import { vehicleIcon, vehiclePopupHtml } from "./icons";
 import type { SimVehicle } from "@/lib/sim/traffic";
 import type { Zone } from "@/lib/sim/world";
 import type { SpeedLimits } from "@/lib/sim/speed-rules";
+import { CBE_GEOFENCE, GEOFENCE_NAME } from "@/lib/sim/geofence";
 
 interface VehicleLayerOpts {
   visible?: (v: SimVehicle) => boolean;
@@ -29,12 +30,13 @@ export function useVehicleLayer(ctx: MapCtx | null, vehicles: SimVehicle[], opts
       seen.add(v.id);
       const selected = opts.selectedId === v.id;
       const alerted = opts.alerted?.has(v.id) ?? false;
+      const external = v.geo.mode === "external";
       const tagOn = typeof opts.showTags === "function" ? opts.showTags(v) : !!opts.showTags;
       const tag = tagOn || selected ? v.plate : undefined;
-      const key = `${v.status}|${selected}|${tag ?? ""}|${alerted}`;
+      const key = `${v.status}|${selected}|${tag ?? ""}|${alerted}|${external}`;
       const existing = markers.current.get(v.id);
       if (!existing) {
-        const m = L.marker(v.pos, { icon: vehicleIcon(L, v.status, { selected, tag, alerted }), riseOnHover: true })
+        const m = L.marker(v.pos, { icon: vehicleIcon(L, v.status, { selected, tag, alerted, external }), riseOnHover: true })
           .bindPopup(vehiclePopupHtml(v), { closeButton: true, autoPan: false })
           .on("click", () => onSelectRef.current?.(v.id))
           .addTo(map);
@@ -42,7 +44,7 @@ export function useVehicleLayer(ctx: MapCtx | null, vehicles: SimVehicle[], opts
       } else {
         existing.m.setLatLng(v.pos);
         if (existing.key !== key) {
-          existing.m.setIcon(vehicleIcon(L, v.status, { selected, tag, alerted }));
+          existing.m.setIcon(vehicleIcon(L, v.status, { selected, tag, alerted, external }));
           existing.key = key;
         }
         if (v.status !== "normal") existing.m.setZIndexOffset(v.status === "violation" ? 800 : 400);
@@ -111,4 +113,26 @@ export function useZoneLayer(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx, zones, limits, highlightId, visible]);
+}
+
+/** Draws the Coimbatore operational geofence. It is a monitoring boundary, not a movement limit. */
+export function useGeofenceLayer(ctx: MapCtx | null, visible = true) {
+  useEffect(() => {
+    if (!ctx || !visible) return;
+    const { L, map } = ctx;
+    const poly = L.polygon(CBE_GEOFENCE, {
+      color: "var(--primary)",
+      weight: 2,
+      dashArray: "10 6",
+      fillColor: "var(--primary)",
+      fillOpacity: 0.035,
+      interactive: true,
+    })
+      .bindTooltip(`<b>${GEOFENCE_NAME}</b><br/>Inside: local monitoring · Outside: external AI handoff (simulated)`, { sticky: true })
+      .addTo(map);
+    poly.bringToBack();
+    return () => {
+      poly.remove();
+    };
+  }, [ctx, visible]);
 }

@@ -87,6 +87,19 @@ export const LANDMARKS: Landmark[] = [
   { name: "Ganapathy", at: [11.0425, 76.98] },
   { name: "RS Puram", at: [11.0105, 76.95] },
   { name: "Vadavalli", at: [11.0215, 76.913] },
+  { name: "Saravanampatti", at: [11.078, 76.998] },
+  { name: "Kalapatti", at: [11.066, 77.04] },
+  { name: "Podanur", at: [10.968, 76.99] },
+  // Outside the city geofence
+  { name: "Periyanaickenpalayam", at: [11.152, 76.95] },
+  { name: "Narasimhanaickenpalayam", at: [11.128, 76.948] },
+  { name: "Neelambur", at: [11.058, 77.085] },
+  { name: "Sulur", at: [11.025, 77.125] },
+  { name: "Chettipalayam", at: [10.912, 77.03] },
+  { name: "Madukkarai", at: [10.905, 76.96] },
+  { name: "Malumichampatti", at: [10.905, 76.998] },
+  { name: "Perur", at: [10.975, 76.913] },
+  { name: "Thondamuthur", at: [10.99, 76.85] },
 ];
 
 export function nearestLandmark(p: LatLng): string {
@@ -102,8 +115,8 @@ export function nearestLandmark(p: LatLng): string {
   return best.name;
 }
 
-export function locationLabel(road: RoadId, p: LatLng): string {
-  return `${ROAD_NAMES[road]}, near ${nearestLandmark(p)}`;
+export function locationLabel(roadName: string, p: LatLng): string {
+  return `${roadName}, near ${nearestLandmark(p)}`;
 }
 
 export interface ZoneResolution {
@@ -161,54 +174,10 @@ export interface Hospital {
   name: string;
   short: string;
   at: LatLng;
-  route: Polyline;
-  signals: { name: string; at: number }[];
 }
 
-export const INCIDENT = {
-  name: "Two-wheeler collision · Gandhipuram",
-  at: ROAD_GEOMETRY.em_kmch[0]!,
-};
-
 export const HOSPITALS: Hospital[] = [
-  {
-    id: "kmch",
-    name: "KMCH Speciality Hospital, Avinashi Road",
-    short: "KMCH",
-    at: ROAD_GEOMETRY.em_kmch[ROAD_GEOMETRY.em_kmch.length - 1]!,
-    route: buildPolyline(ROAD_GEOMETRY.em_kmch),
-    signals: [
-      { name: "100 Feet Road Jn", at: 0.1 },
-      { name: "Lakshmi Mills Jn", at: 0.24 },
-      { name: "Nava India Jn", at: 0.4 },
-      { name: "Peelamedu Jn", at: 0.56 },
-      { name: "Hope College Jn", at: 0.7 },
-      { name: "Airport Jn", at: 0.86 },
-    ],
-  },
-  {
-    id: "cmch",
-    name: "Government Medical College Hospital",
-    short: "CMCH",
-    at: ROAD_GEOMETRY.em_cmch[ROAD_GEOMETRY.em_cmch.length - 1]!,
-    route: buildPolyline(ROAD_GEOMETRY.em_cmch),
-    signals: [
-      { name: "Gandhipuram Jn", at: 0.12 },
-      { name: "Cross Cut Jn", at: 0.32 },
-      { name: "Oppanakara St Jn", at: 0.55 },
-      { name: "Town Hall Jn", at: 0.74 },
-      { name: "Trichy Road Jn", at: 0.9 },
-    ],
-  },
-  {
-    id: "srh",
-    name: "Sri Ramakrishna Hospital",
-    short: "SRH",
-    at: ROAD_GEOMETRY.em_srh[ROAD_GEOMETRY.em_srh.length - 1]!,
-    route: buildPolyline(ROAD_GEOMETRY.em_srh),
-    signals: [
-      { name: "Gandhipuram Jn", at: 0.2 },
-      { name: "Sathy Road Jn", at: 0.62 },
-    ],
-  },
+  { id: "kmch", name: "KMCH Speciality Hospital, Avinashi Road", short: "KMCH", at: [11.04178, 77.03966] },
+  { id: "cmch", name: "Government Medical College Hospital", short: "CMCH", at: [10.99639, 76.9705] },
+  { id: "srh", name: "Sri Ramakrishna Hospital", short: "SRH", at: [11.01982, 76.97665] },
 ];

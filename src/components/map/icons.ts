@@ -1,7 +1,8 @@
 import type { LeafletNS } from "./useLeafletMap";
-import type { SimVehicle } from "@/lib/sim/traffic";
+import { monitoringText, vehicleZoneText, type SimVehicle } from "@/lib/sim/traffic";
 import type { SpeedStatus } from "@/lib/sim/speed-rules";
-import { ZONE_LABEL } from "@/lib/sim/speed-rules";
+import { NODES } from "@/lib/sim/network";
+import { nearestLandmark } from "@/lib/sim/world";
 
 const svg = (paths: string) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
@@ -13,16 +14,17 @@ export const SVG = {
   hospital: svg('<path d="M12 6v4"/><path d="M14 14h-4"/><path d="M14 18h-4"/><path d="M14 8h-4"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/>'),
   alert: svg('<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),
   incident: svg('<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>'),
+  blocked: svg('<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>'),
 };
 
 export function vehicleIcon(
   L: LeafletNS,
   status: SpeedStatus | "emergency",
-  opts: { selected?: boolean; tag?: string | undefined; alerted?: boolean } = {},
+  opts: { selected?: boolean; tag?: string | undefined; alerted?: boolean; external?: boolean } = {},
 ) {
   const ring = status !== "normal" || opts.alerted ? '<span class="ring"></span>' : "";
   const tag = opts.tag ? `<span class="tag">${opts.tag}</span>` : "";
-  const cls = opts.alerted ? "veh-warning" : `veh-${status}`;
+  const cls = opts.alerted ? "veh-warning" : opts.external ? "veh-external" : `veh-${status}`;
   return L.divIcon({
     className: "veh-anim",
     html: `<div class="veh-marker ${cls} ${opts.selected ? "is-selected" : ""}">${ring}<span class="core"></span>${tag}</div>`,
@@ -52,8 +54,8 @@ export function signalIcon(L: LeafletNS, state: "red" | "amber" | "green" | "pri
   });
 }
 
-export function pinIcon(L: LeafletNS, kind: "hospital" | "accident" | "incident") {
-  const glyph = kind === "hospital" ? SVG.hospital : kind === "accident" ? SVG.alert : SVG.incident;
+export function pinIcon(L: LeafletNS, kind: "hospital" | "accident" | "incident" | "blocked") {
+  const glyph = kind === "hospital" ? SVG.hospital : kind === "accident" ? SVG.alert : kind === "blocked" ? SVG.blocked : SVG.incident;
   return L.divIcon({
     className: "",
     html: `<div class="pin-marker pin-${kind}">${glyph}</div>`,
@@ -69,15 +71,19 @@ const STATUS_TEXT: Record<SpeedStatus, string> = {
 };
 
 export function vehiclePopupHtml(v: SimVehicle) {
-  return `<div class="veh-${v.status}">
-    <div class="popup-title"><span>${v.plate}</span><span class="popup-chip">${STATUS_TEXT[v.status]}</span></div>
+  const external = v.geo.mode === "external";
+  const dest = NODES[v.dest];
+  return `<div class="${external ? "veh-external" : `veh-${v.status}`}">
+    <div class="popup-title"><span>${v.plate}</span><span class="popup-chip">${external ? "OUTSIDE CITY" : STATUS_TEXT[v.status]}</span></div>
     <dl class="popup-grid">
       <dt>Current speed</dt><dd>${v.speed} km/h</dd>
-      <dt>Speed limit</dt><dd>${v.limit} km/h</dd>
-      <dt>Zone</dt><dd>${v.zoneType === "urban" ? ZONE_LABEL.urban : v.zoneName}</dd>
+      <dt>Speed limit</dt><dd>${external ? "Not enforced locally" : `${v.limit} km/h`}</dd>
+      <dt>Zone</dt><dd>${vehicleZoneText(v)}</dd>
       <dt>Category</dt><dd>${v.category}</dd>
       <dt>Location</dt><dd>${v.location}</dd>
-      <dt>Monitoring</dt><dd>GPS · Geofence active</dd>
+      <dt>Heading to</dt><dd>${dest ? nearestLandmark(dest) : "—"}</dd>
+      <dt>Monitoring</dt><dd>${monitoringText(v)}</dd>
+      <dt>City crossings</dt><dd>${v.geo.entries} in · ${v.geo.exits} out${v.geo.retained.length ? ` · ${v.geo.retained.length} session${v.geo.retained.length > 1 ? "s" : ""} retained` : ""}</dd>
     </dl>
   </div>`;
 }

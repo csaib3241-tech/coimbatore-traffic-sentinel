@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { DEFAULT_GRACE_SECONDS, DEFAULT_LIMITS, type SpeedLimits } from "./sim/speed-rules";
 import { applyReview, type ReviewDecision, type ViolationRecord } from "./violations";
+import type { GeofenceEvent } from "./sim/traffic";
 
 export type NoticeLevel = "info" | "warning" | "critical" | "emergency" | "success";
 
@@ -22,6 +23,21 @@ export interface EmergencyLogEntry {
   ts: number;
 }
 
+export interface GeofenceLogEntry extends GeofenceEvent {
+  id: string;
+  ts: number;
+}
+
+export interface GeofenceStats {
+  entries: number;
+  exits: number;
+  reentries: number;
+  /** Latest crossings (entries, re-entries and exits). */
+  log: GeofenceLogEntry[];
+  /** Exits whose local history was retained and handed to the external system (simulated). */
+  handoffs: GeofenceLogEntry[];
+}
+
 export interface AppSettings {
   driverAlerts: boolean;
   autoCapture: boolean;
@@ -39,6 +55,7 @@ export interface AppState {
   emergencyActive: boolean;
   emergencyLabel: string | null;
   emergencyLog: EmergencyLogEntry[];
+  geofence: GeofenceStats;
 }
 
 const MIN = 60_000;
@@ -91,6 +108,7 @@ function createInitialState(): AppState {
       { id: "e2", vehicle: "FIRE 02", destination: "Singanallur", minutes: 9.4, priority: true, ts: now - 300 * MIN },
       { id: "e3", vehicle: "AMB 011", destination: "CMCH", minutes: 12.8, priority: false, ts: now - 420 * MIN },
     ],
+    geofence: { entries: 0, exits: 0, reentries: 0, log: [], handoffs: [] },
   };
 }
 
@@ -176,6 +194,21 @@ export const actions = {
   },
   logEmergency(e: Omit<EmergencyLogEntry, "id" | "ts">) {
     set((s) => ({ ...s, emergencyLog: [{ ...e, id: uid("e"), ts: Date.now() }, ...s.emergencyLog] }));
+  },
+  recordGeofence(events: GeofenceEvent[]) {
+    if (!events.length) return;
+    const ts = Date.now();
+    const rows = events.map((e) => ({ ...e, id: uid("g"), ts }));
+    set((s) => ({
+      ...s,
+      geofence: {
+        entries: s.geofence.entries + events.filter((e) => e.kind === "entry").length,
+        reentries: s.geofence.reentries + events.filter((e) => e.kind === "reentry").length,
+        exits: s.geofence.exits + events.filter((e) => e.kind === "exit").length,
+        log: [...rows, ...s.geofence.log].slice(0, 40),
+        handoffs: [...rows.filter((r) => r.kind === "exit"), ...s.geofence.handoffs].slice(0, 20),
+      },
+    }));
   },
   resetDemo() {
     state = createInitialState();

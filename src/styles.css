@@ -325,6 +325,8 @@
 .veh-warning { --veh-color: var(--warning); }
 .veh-violation { --veh-color: var(--critical); }
 .veh-emergency { --veh-color: var(--emergency); }
+.veh-external { --veh-color: var(--muted-foreground); }
+.veh-marker.veh-external .core { border-style: dashed; opacity: 0.85; box-shadow: none; }
 .veh-marker.is-selected .core {
   outline: 2px solid var(--primary);
   outline-offset: 3px;
@@ -407,6 +409,7 @@
 .pin-hospital { --pin-color: var(--safe); }
 .pin-accident { --pin-color: var(--warning); }
 .pin-incident { --pin-color: var(--critical); }
+.pin-blocked { --pin-color: var(--critical); background: color-mix(in oklab, var(--critical) 25%, oklch(0.16 0.03 257)); animation: pulse-sig 1.2s ease-in-out infinite; }
 .pin-camera { --pin-color: var(--primary); }
 
 .route-flow {
